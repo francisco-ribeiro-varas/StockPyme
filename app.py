@@ -9,7 +9,9 @@ from dotenv import load_dotenv
 # Importar SDK nativo de Azure
 from azure.storage.blob import BlobServiceClient, generate_blob_sas, BlobSasPermissions
 
-# Forzar la lectura manual del archivo .env en la raíz del proyecto
+# ─────────────────────────────────────────────────────────────────
+# 🛠️ PARCHE DE INYECCIÓN MANUAL PARA EL ARCHIVO .ENV
+# ─────────────────────────────────────────────────────────────────
 base_dir = os.path.dirname(__file__)
 ruta_env = os.path.join(base_dir, '.env')
 load_dotenv(dotenv_path=ruta_env)
@@ -24,14 +26,16 @@ AZURE_NAME = os.getenv('AZURE_ACCOUNT_NAME', '')
 AZURE_KEY = os.getenv('AZURE_ACCOUNT_KEY', '')
 AZURE_CONTAINER = os.getenv('AZURE_CONTAINER', 'imagenes')
 
-# Inicializar cliente de Azure mediante la cadena de conexión limpia
-if AZURE_NAME and AZURE_KEY:
-    CADENA_CONEXION = f"DefaultEndpointsProtocol=https;AccountName={AZURE_NAME};AccountKey={AZURE_KEY};EndpointSuffix=core.windows.net"
-    blob_service_client = BlobServiceClient.from_connection_string(CADENA_CONEXION)
-    container_client = blob_service_client.get_container_client(AZURE_CONTAINER)
-else:
-    blob_service_client = None
-    container_client = None
+# RESPALDO DIRECTO: Si el .env no inyecta variables a la terminal, forzamos tus datos reales
+if not AZURE_NAME or AZURE_NAME == '':
+    AZURE_NAME = "stockpyme"
+    AZURE_KEY = "EC4OScT+BRSPMr/mu1Tbg/gh0e3DQ6FQwcQ5gR7ztRBeG5U7q0ToW8DXaSAvg=="
+    AZURE_CONTAINER = "imagenes"
+
+# INSTANCIACIÓN ASEGURADA: Se ejecuta sí o sí con datos válidos
+CADENA_CONEXION = f"DefaultEndpointsProtocol=https;AccountName={AZURE_NAME};AccountKey={AZURE_KEY};EndpointSuffix=core.windows.net"
+blob_service_client = BlobServiceClient.from_connection_string(CADENA_CONEXION)
+container_client = blob_service_client.get_container_client(AZURE_CONTAINER)
 
 EXTENSIONES_PERMITIDAS = {'png', 'jpg', 'jpeg', 'webp', 'gif'}
 
@@ -58,11 +62,10 @@ def generar_url_sas(blob_name):
 # 🗄️ CONFIGURACIÓN DE CONEXIÓN ORACLE (Modo Thin Directo con Wallet)
 # =====================================================================
 DB_USER = os.getenv('DB_USER', 'ADMIN')
-DB_PASSWORD = os.getenv('DB_PASSWORD', '')
+DB_PASSWORD = os.getenv('DB_PASSWORD', 'Randy-2026**')  # Tu contraseña asignada por defecto si falla el env
 DB_DSN = os.getenv('DB_DSN', 'miinventariofacil_medium')
-RUTA_WALLET = os.getenv('RUTA_WALLET', os.path.join(base_dir, 'wallet'))
-WALLET_PASSWORD = os.getenv('WALLET_PASSWORD', '')
-
+RUTA_WALLET = os.getenv('RUTA_WALLET', r"C:\Users\fribe\OneDrive\Escritorio\StockPyme\wallet")
+WALLET_PASSWORD = os.getenv('WALLET_PASSWORD', 'Randy-2026**')
 
 def obtener_conexion():
     """Establece conexión directa en modo Thin pasando la clave del Wallet automáticamente"""
