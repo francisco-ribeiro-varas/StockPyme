@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>MiInventario Fácil - Iniciar Sesión</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background-color: #f4f6f9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .login-box {
+            background: white;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            text-align: center;
+            width: 320px;
+        }
+        h2 { margin-bottom: 10px; color: #333; }
+        .subtitle { color: #777; font-size: 14px; margin-bottom: 25px; }
+        input {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        button {
+            width: 100%;
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 15px;
+        }
+        button:hover { background: #0056b3; }
+        .error-msg { color: #dc3545; font-size: 14px; margin-top: 10px; display: none; }
+    </style>
+</head>
+<body>
+
+    <div class="login-box">
+        <h2>📦 MiInventario</h2>
+        <div class="subtitle">Ingresa para gestionar tu negocio</div>
+        
+        <form onsubmit="procesarLogin(event)">
+            <input type="email" id="correo" placeholder="Correo Electrónico" required>
+            <input type="password" id="contrasenia" placeholder="Contraseña" required>
+            <button type="submit">Ingresar</button>
+        </form>
+        
+        <div id="mensaje-error" class="error-msg"></div>
+    </div>
+
+    <script>
+        async function procesarLogin(event) {
+            event.preventDefault();
+            const correo = document.getElementById('correo').value;
+            const contrasenia = document.getElementById('contrasenia').value;
+            const errorDiv = document.getElementById('mensaje-error');
+
+            errorDiv.style.display = "none";
+
+            // Enviamos los datos a la API de Python
+            const respuesta = await fetch('/api/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ correo, contrasenia })
+            });
+
+            if (respuesta.ok) {
+                // Si Python dice que está OK, vamos al Dashboard
+                window.location.href = '/dashboard';
+            } else {
+                // Si falla, mostramos el mensaje de error en pantalla
+                const resultado = await respuesta.json();
+                errorDiv.innerText = resultado.message || "Error al iniciar sesión";
+                errorDiv.style.display = "block";
+            }
+        }
+    </script>
+</body>
+</html>
